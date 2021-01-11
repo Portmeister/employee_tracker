@@ -38,7 +38,7 @@ connection.connect(async (err) => {
 
 async function runSearch() {
 
-    let answer, employee, role, dept;
+    let answer;
 
     answer = await promptChoices();
 
