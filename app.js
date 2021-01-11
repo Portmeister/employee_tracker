@@ -42,29 +42,57 @@ async function runSearch() {
 
     answer = await promptChoices();
 
-    switch (answer.name) {
-        case ALL_SONGS_BY_ARTIST:
-            artist = await promptArtistName();
-            artistSearch(connection, artist.name);
+    switch (answer.action) {
+        case VIEW_EMPLOYEES:
+            viewAllEmp();
             break;
 
-        case ARTISTS_WITH_TWO_OR_MORE_SONGS:
-            multiSearch(connection);
+        case EMPLOYEES_BY_ROLE:
+            viewAllEmpByRole();
             break;
 
-        case SONGS_BY_RANGE:
-            range = await promptRange();
-            rangeSearch(connection, range.start, range.end);
+        case EMPLOYEES_BY_DEPT:
+            viewAllEmpByDept();
             break;
 
-        case SPECIFIC_SONG:
-            song = await promptSong();
-            songSearch(connection,song.title);
+        case EMPLOYEES_BY_MGR:
+            viewAllEmpByMngr();
+            break;
+        
+        case ADD_EMPLOYEE:
+            addEmp();
             break;
 
-        case TOP_SONG_AND_ALBUM_BY_ARTIST:
-            artist = await promptArtistName();
-            songAndAlbumSearch(connection, artist.name);
+        case ADD_ROLE:
+            addRole();
+            break;
+        
+        case ADD_DEPT:
+            addDept();
+            break;
+
+        case UPDATE_ROLE:
+            updateEmpRole();
+            break;
+
+        case UPDATE_MGR:
+            updateEmpMngr();
+            break;
+
+        case DELETE_EMPLOYEE:
+            deleteEmp();
+            break;
+
+        case DELETE_ROLE:
+            deleteRole();
+            break;
+
+        case DELETE_DEPT:
+            deleteDept();
+            break;
+
+        case VIEW_BUDGET:
+            viewDeptBudget();
             break;
     };
 }
