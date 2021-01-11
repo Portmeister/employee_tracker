@@ -2,14 +2,40 @@
 const mysql = require('mysql2');
 
 // Import Constants Choice Variables
-const [ALL_SONGS_BY_ARTIST, ARTISTS_WITH_TWO_OR_MORE_SONGS, 
-       SONGS_BY_RANGE, SPECIFIC_SONG, TOP_SONG_AND_ALBUM_BY_ARTIST] = require('./lib/const');
+const [VIEW_EMPLOYEES,
+    EMPLOYEES_BY_ROLE,
+    EMPLOYEES_BY_DEPT,
+    EMPLOYEES_BY_MGR,
+    ADD_EMPLOYEE,
+    ADD_ROLE,
+    ADD_DEPT,
+    UPDATE_ROLE,
+    UPDATE_MGR,
+    DELETE_EMPLOYEE,
+    DELETE_ROLE,
+    DELETE_DEPT,
+    VIEW_BUDGET] = require('./lib/const');
 
 // Import Prompt Functions
-const {promptChoices, promptArtistName,promptRange,promptSong} = require('./lib/prompts');
+const {promptChoices, 
+    promptEmployee,
+    promptRole,
+    promptDept} = require('./lib/prompts');
 
 // Import Query Functions
-const  {artistSearch, multiSearch, rangeSearch, songSearch, songAndAlbumSearch} = require('./lib/queries');
+const  {viewAllEmp, 
+    viewAllEmpByRole,
+    viewAllEmpByDept,
+    viewAllEmpByMngr,
+    addEmp,
+    addRole,
+    addDept,
+    updateEmpRole,
+    updateEmpMngr,
+    deleteEmp,
+    deleteRole,
+    deleteDept,
+    viewDeptBudget} = require('./lib/queries');
 
 
 // Connect to the top_songsDB database using a localhost connection
