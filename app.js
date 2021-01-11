@@ -67,55 +67,55 @@ async function runSearch() {
 
     switch (answer.action) {
         case VIEW_EMPLOYEES:
-            viewAllEmp();
+            viewAllEmp;
             break;
 
         case EMPLOYEES_BY_ROLE:
-            viewAllEmpByRole();
+            viewAllEmpByRole;
             break;
 
         case EMPLOYEES_BY_DEPT:
-            viewAllEmpByDept();
+            viewAllEmpByDept;
             break;
 
         case EMPLOYEES_BY_MGR:
-            viewAllEmpByMngr();
+            viewAllEmpByMngr;
             break;
         
         case ADD_EMPLOYEE:
-            addEmp();
+            addEmp;
             break;
 
         case ADD_ROLE:
-            addRole();
+            addRole;
             break;
         
         case ADD_DEPT:
-            addDept();
+            addDept;
             break;
 
         case UPDATE_ROLE:
-            updateEmpRole();
+            updateEmpRole;
             break;
 
         case UPDATE_MGR:
-            updateEmpMngr();
+            updateEmpMngr;
             break;
 
         case DELETE_EMPLOYEE:
-            deleteEmp();
+            deleteEmp;
             break;
 
         case DELETE_ROLE:
-            deleteRole();
+            deleteRole;
             break;
 
         case DELETE_DEPT:
-            deleteDept();
+            deleteDept;
             break;
 
         case VIEW_BUDGET:
-            viewDeptBudget();
+            viewDeptBudget;
             break;
     };
 }
