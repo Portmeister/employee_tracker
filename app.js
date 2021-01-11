@@ -17,10 +17,7 @@ const [VIEW_EMPLOYEES,
     VIEW_BUDGET] = require('./lib/const');
 
 // Import Prompt Functions
-const {promptChoices, 
-    promptEmployee,
-    promptRole,
-    promptDept} = require('./lib/prompts');
+const {promptChoices} = require('./lib/prompts');
 
 // Import Query Functions
 const  {viewAllEmp, 
