@@ -1,23 +1,7 @@
-// Import the mysql package
-const mysql = require("mysql2");
-const promisemysql = require("promise-mysql");
-const consoleTable = require("console.table");
+const mysql = require("mysql");
 const inquirer = require("inquirer");
-
-// Import Constants Choice Variables
-const [VIEW_EMPLOYEES,
-    EMPLOYEES_BY_ROLE,
-    EMPLOYEES_BY_DEPT,
-    EMPLOYEES_BY_MGR,
-    ADD_EMPLOYEE,
-    ADD_ROLE,
-    ADD_DEPT,
-    UPDATE_ROLE,
-    UPDATE_MGR,
-    DELETE_EMPLOYEE,
-    DELETE_ROLE,
-    DELETE_DEPT,
-    VIEW_BUDGET] = require('./lib/const');
+const consoleTable = require("console.table");
+const promisemysql = require("promise-mysql");
 
 // Connection Properties
 const connectionProperties = {
@@ -31,16 +15,19 @@ const connectionProperties = {
 // Creating Connection
 const connection = mysql.createConnection(connectionProperties);
 
+
 // Establishing Connection to database
 connection.connect((err) => {
     if (err) throw err;
-    console.log('connected as id ' + connection.threadId);
-    promptChoices();
-    connection.end();
+
+    // Start main menu function
+
+    console.log("\n WELCOME TO EMPLOYEE TRACKER \n");
+    mainMenu();
 });
 
 // Main menu function
-function promptChoices(){
+function mainMenu(){
 
     // Prompt user to choose an option
     inquirer
@@ -49,81 +36,73 @@ function promptChoices(){
       type: "list",
       message: "MAIN MENU",
       choices: [
-        VIEW_EMPLOYEES,
-                    EMPLOYEES_BY_ROLE,
-                    EMPLOYEES_BY_DEPT,
-                    EMPLOYEES_BY_MGR,
-                    ADD_EMPLOYEE,
-                    ADD_ROLE,
-                    ADD_DEPT,
-                    UPDATE_ROLE,
-                    UPDATE_MGR,
-                    DELETE_EMPLOYEE,
-                    DELETE_ROLE,
-                    DELETE_DEPT,
-                    VIEW_BUDGET,
-                    "EXIT"
+        "View all employees",
+        "View all employees by role",
+        "View all employees by department",
+        "View all employees by manager",
+        "Add employee",
+        "Add role",
+        "Add department",
+        "Update employee role",
+        "Update employee manager",
+        "Delete employee",
+        "Delete role",
+        "Delete department",
+        "View department budgets"
       ]
     })
     .then((answer) => {
 
         // Switch case depending on user option
         switch (answer.action) {
-            case VIEW_EMPLOYEES:
+            case "View all employees":
                 viewAllEmp();
                 break;
-    
-            case EMPLOYEES_BY_ROLE:
-                viewAllEmpByRole();
-                break;
-    
-            case EMPLOYEES_BY_DEPT:
+
+            case "View all employees by department":
                 viewAllEmpByDept();
                 break;
-    
-            case EMPLOYEES_BY_MGR:
-                viewAllEmpByMngr();
+
+            case "View all employees by role":
+                viewAllEmpByRole();
                 break;
-            
-            case ADD_EMPLOYEE:
+
+            case "Add employee":
                 addEmp();
                 break;
-    
-            case ADD_ROLE:
-                addRole();
-                break;
-            
-            case ADD_DEPT:
+
+            case "Add department":
                 addDept();
                 break;
-    
-            case UPDATE_ROLE:
+            case "Add role":
+                addRole();
+                break;
+            case "Update employee role":
                 updateEmpRole();
                 break;
-    
-            case UPDATE_MGR:
+            case "Update employee manager":
                 updateEmpMngr();
                 break;
-    
-            case DELETE_EMPLOYEE:
+            case "View all employees by manager":
+                viewAllEmpByMngr();
+                break;
+            case "Delete employee":
                 deleteEmp();
                 break;
-    
-            case DELETE_ROLE:
+            case "View department budgets":
+                viewDeptBudget();
+                break;
+            case "Delete role":
                 deleteRole();
                 break;
-    
-            case DELETE_DEPT:
+            case "Delete department":
                 deleteDept();
-                break;
-    
-            case VIEW_BUDGET:
-                viewDeptBudget();
                 break;
         }
     });
 }
 
+// View all employees 
 function viewAllEmp(){
 
     // Query to view all employees
@@ -138,53 +117,11 @@ function viewAllEmp(){
         console.table(res);
 
         //Back to main menu
-        promptChoices();
+        mainMenu();
     });
 }
 
-function viewAllEmpByRole(){
-
-    // set global array to store all roles
-    let roleArr = [];
-
-    // Create connection using promise-sql
-    promisemysql.createConnection(connectionProperties)
-    .then((conn) => {
-
-        // Query all roles
-        return conn.query('SELECT title FROM role');
-    }).then(function(roles){
-
-        // Place all roles within the roleArry
-        for (i=0; i < roles.length; i++){
-            roleArr.push(roles[i].title);
-        }
-    }).then(() => {
-
-        // Prompt user to select a role
-        inquirer.prompt({
-            name: "role",
-            type: "list",
-            message: "Which role would you like to search?",
-            choices: roleArr
-        })    
-        .then((answer) => {
-
-            // Query all employees by role selected by user
-            const query = `SELECT e.id AS ID, e.first_name AS 'First Name', e.last_name AS 'Last Name', role.title AS Title, department.name AS Department, role.salary AS Salary, concat(m.first_name, ' ' ,  m.last_name) AS Manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON e.role_id = role.id INNER JOIN department ON role.department_id = department.id WHERE role.title = '${answer.role}' ORDER BY ID ASC`;
-            connection.query(query, (err, res) => {
-                if(err) return err;
-
-                // show results using console.table
-                console.log("\n");
-                console.table(res);
-                promptChoices();
-            });
-        });
-    });
-}
-
-
+// View all employees by department
 function viewAllEmpByDept(){
 
     // Set global array to store department names
@@ -225,75 +162,56 @@ function viewAllEmpByDept(){
                 console.table(res);
 
                 // Back to main menu
-                promptChoices();
+                mainMenu();
             });
         });
     });
 }
 
-function viewAllEmpByMngr(){
+// view all employees by role
+function viewAllEmpByRole(){
 
-    // set manager array
-    let managerArr = [];
+    // set global array to store all roles
+    let roleArr = [];
 
     // Create connection using promise-sql
     promisemysql.createConnection(connectionProperties)
     .then((conn) => {
 
-        // Query all employees
-        return conn.query("SELECT DISTINCT m.id, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e Inner JOIN employee m ON e.manager_id = m.id");
+        // Query all roles
+        return conn.query('SELECT title FROM role');
+    }).then(function(roles){
 
-    }).then(function(managers){
-
-        // place all employees in array
-        for (i=0; i < managers.length; i++){
-            managerArr.push(managers[i].manager);
+        // Place all roles within the roleArry
+        for (i=0; i < roles.length; i++){
+            roleArr.push(roles[i].title);
         }
+    }).then(() => {
 
-        return managers;
-    }).then((managers) => {
-
+        // Prompt user to select a role
         inquirer.prompt({
-
-            // Prompt user of manager
-            name: "manager",
+            name: "role",
             type: "list",
-            message: "Which manager would you like to search?",
-            choices: managerArr
+            message: "Which role would you like to search?",
+            choices: roleArr
         })    
         .then((answer) => {
 
-            let managerID;
-
-            // get ID of manager selected
-            for (i=0; i < managers.length; i++){
-                if (answer.manager == managers[i].manager){
-                    managerID = managers[i].id;
-                }
-            }
-
-            // query all employees by selected manager
-            const query = `SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, concat(m.first_name, ' ' ,  m.last_name) AS manager
-            FROM employee e
-            LEFT JOIN employee m ON e.manager_id = m.id
-            INNER JOIN role ON e.role_id = role.id
-            INNER JOIN department ON role.department_id = department.id
-            WHERE e.manager_id = ${managerID};`;
-    
+            // Query all employees by role selected by user
+            const query = `SELECT e.id AS ID, e.first_name AS 'First Name', e.last_name AS 'Last Name', role.title AS Title, department.name AS Department, role.salary AS Salary, concat(m.first_name, ' ' ,  m.last_name) AS Manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON e.role_id = role.id INNER JOIN department ON role.department_id = department.id WHERE role.title = '${answer.role}' ORDER BY ID ASC`;
             connection.query(query, (err, res) => {
                 if(err) return err;
-                
-                // display results with console.table
+
+                // show results using console.table
                 console.log("\n");
                 console.table(res);
-
-                // back to main menu
-                promptChoices();
+                mainMenu();
             });
         });
     });
 }
 
+// Add employee
 function addEmp(){
 
     // Create two global array to hold 
@@ -400,12 +318,13 @@ function addEmp(){
 
                     // Confirm employee has been added
                     console.log(`\n EMPLOYEE ${answer.firstName} ${answer.lastName} ADDED...\n `);
-                    promptChoices();
+                    mainMenu();
                 });
             });
     });
 }
 
+// Add Role
 function addRole(){
 
     // Create array of departments
@@ -464,7 +383,7 @@ function addRole(){
                 VALUES ("${answer.roleTitle}", ${answer.salary}, ${deptID})`, (err, res) => {
                     if(err) return err;
                     console.log(`\n ROLE ${answer.roleTitle} ADDED...\n`);
-                    promptChoices();
+                    mainMenu();
                 });
 
             });
@@ -473,6 +392,7 @@ function addRole(){
     
 }
 
+// Add Department
 function addDept(){
 
     inquirer.prompt({
@@ -487,12 +407,13 @@ function addDept(){
             connection.query(`INSERT INTO department (name)VALUES ("${answer.deptName}");`, (err, res) => {
                 if(err) return err;
                 console.log("\n DEPARTMENT ADDED...\n ");
-                promptChoices();
+                mainMenu();
             });
 
         });
 }
 
+// Update Employee Role
 function updateEmpRole(){
 
     // create employee and role array
@@ -564,13 +485,14 @@ function updateEmpRole(){
                     console.log(`\n ${answer.employee} ROLE UPDATED TO ${answer.role}...\n `);
 
                     // back to main menu
-                    promptChoices();
+                    mainMenu();
                 });
             });
     });
     
 }
 
+// Update employee manager
 function updateEmpMngr(){
 
     // set global array for employees
@@ -632,12 +554,77 @@ function updateEmpMngr(){
                     console.log(`\n ${answer.employee} MANAGER UPDATED TO ${answer.manager}...\n`);
 
                     // go back to main menu
-                    promptChoices();
+                    mainMenu();
                 });
             });
     });
 }
 
+// View all employees by manager
+function viewAllEmpByMngr(){
+
+    // set manager array
+    let managerArr = [];
+
+    // Create connection using promise-sql
+    promisemysql.createConnection(connectionProperties)
+    .then((conn) => {
+
+        // Query all employees
+        return conn.query("SELECT DISTINCT m.id, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee e Inner JOIN employee m ON e.manager_id = m.id");
+
+    }).then(function(managers){
+
+        // place all employees in array
+        for (i=0; i < managers.length; i++){
+            managerArr.push(managers[i].manager);
+        }
+
+        return managers;
+    }).then((managers) => {
+
+        inquirer.prompt({
+
+            // Prompt user of manager
+            name: "manager",
+            type: "list",
+            message: "Which manager would you like to search?",
+            choices: managerArr
+        })    
+        .then((answer) => {
+
+            let managerID;
+
+            // get ID of manager selected
+            for (i=0; i < managers.length; i++){
+                if (answer.manager == managers[i].manager){
+                    managerID = managers[i].id;
+                }
+            }
+
+            // query all employees by selected manager
+            const query = `SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, concat(m.first_name, ' ' ,  m.last_name) AS manager
+            FROM employee e
+            LEFT JOIN employee m ON e.manager_id = m.id
+            INNER JOIN role ON e.role_id = role.id
+            INNER JOIN department ON role.department_id = department.id
+            WHERE e.manager_id = ${managerID};`;
+    
+            connection.query(query, (err, res) => {
+                if(err) return err;
+                
+                // display results with console.table
+                console.log("\n");
+                console.table(res);
+
+                // back to main menu
+                mainMenu();
+            });
+        });
+    });
+}
+
+// Delete employee
 function deleteEmp(){
 
     // Create global employee array
@@ -689,7 +676,7 @@ function deleteEmp(){
                         console.log(`\n EMPLOYEE '${answer.employee}' DELETED...\n `);
                         
                         // back to main menu
-                        promptChoices();
+                        mainMenu();
                     });
                 } 
                 else {
@@ -698,13 +685,14 @@ function deleteEmp(){
                     console.log(`\n EMPLOYEE '${answer.employee}' NOT DELETED...\n `);
 
                     // back to main menu
-                    promptChoices();
+                    mainMenu();
                 }
                 
             });
     });
 }
 
+// Delete Role
 function deleteRole(){
 
     // Create role array
@@ -733,7 +721,7 @@ function deleteRole(){
 
             // if not, go to main menu
             if (answer.continueDelete === "NO") {
-                promptChoices();
+                mainMenu();
             }
 
         }).then(() => {
@@ -770,7 +758,7 @@ function deleteRole(){
                         console.log(`\n ROLE '${answer.role}' DELETED...\n `);
 
                         //back to main menu
-                        promptChoices();
+                        mainMenu();
                     });
                 } 
                 else {
@@ -779,7 +767,7 @@ function deleteRole(){
                     console.log(`\n ROLE '${answer.role}' NOT DELETED...\n `);
 
                     //back to main menu
-                    promptChoices();
+                    mainMenu();
                 }
                 
             });
@@ -787,6 +775,7 @@ function deleteRole(){
     });
 }
 
+// Delete Department
 function deleteDept(){
 
     // department array
@@ -816,7 +805,7 @@ function deleteDept(){
 
             // if not, go back to main menu
             if (answer.continueDelete === "NO") {
-                promptChoices();
+                mainMenu();
             }
 
         }).then(() => {
@@ -855,7 +844,7 @@ function deleteDept(){
                         console.log(`\n DEPARTMENT '${answer.dept}' DELETED...\n `);
 
                         // back to main menu
-                        promptChoices();
+                        mainMenu();
                     });
                 } 
                 else {
@@ -864,7 +853,7 @@ function deleteDept(){
                     console.log(`\n DEPARTMENT '${answer.dept}' NOT DELETED...\n `);
 
                     //back to main menu
-                    promptChoices();
+                    mainMenu();
                 }
                 
             });
@@ -872,6 +861,7 @@ function deleteDept(){
     });
 }
 
+// View Department Budget
 function viewDeptBudget(){
 
     // Create connection using promise-sql
@@ -913,6 +903,6 @@ function viewDeptBudget(){
         console.table(deptBudgetArr);
 
         // back to main menu
-        promptChoices();
+        mainMenu();
     });
 }
