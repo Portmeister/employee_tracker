@@ -48,7 +48,8 @@ function mainMenu(){
         "Delete employee",
         "Delete role",
         "Delete department",
-        "View department budgets"
+        "View department budgets",
+        "EXIT"
       ]
     })
     .then((answer) => {

@@ -58,6 +58,6 @@ A command-line application that allows the user to:
 
 You are required to submit the following:
 
-* The URL of the GitHub repository: 
+* The URL of the GitHub repository: https://github.com/Portmeister/employee_tracker
 
-* A video demonstrating the entirety of the app's functionality 
+* A video demonstrating the entirety of the app's functionality: https://drive.google.com/file/d/1h3kg0kXHkX4KX5A8gtKZAbRcx-lW7UZJ/view
